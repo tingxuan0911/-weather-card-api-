@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            width: 100%;
+            height: 150px;
+            background-color: rgba(127, 171, 253, 0.432);
+            font-size: 50px;
+            text-align: center;
+            line-height: 100px;
+            color: rgb(255, 255, 255);
+            font-weight: 900;
+        }
+
+        .nav {
+            padding-top: 30px;
+            width: 100%;
+            height: 150px;
+            background-color: rgba(118, 164, 250, 0.712);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            transform: scale(1);
+            transition: 1s;
+        }
+
+        .nav:hover {
+            border-bottom-left-radius: 50%;
+            border-bottom-right-radius: 50%;
+            transform: scale(1.3);
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: start;
+            gap: 10px;
+            padding: 50px 20px;
+            width: 100%;
+            min-height: calc(100vh - 100px);
+            background-color: rgba(135, 175, 250, 0.432);
+        }
+
+        .card {
+            width: 400px;
+            height: 550px;
+            background-color: cornsilk;
+            margin-bottom: 30px;
+            border-radius: 30px;
+            transform: scale(1);
+            transition: 1s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+
+        .card .img {
+            width: 100%;
+            height: 60%;
+            background-color: rgba(231, 245, 253, 0.884);
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+
+        }
+
+        .card .info {
+            width: 100%;
+            height: 40%;
+            background-color: rgba(252, 249, 68, 0.103);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .card .info h1 {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="nav">天氣預測</div>
+    </nav>
+    <div class="content" style="background-image: url('');">
+        <!-- <div class="card">
+            <div class="img"></div>
+            <div class="info">
+                <h1>台中市</h1>
+                <p>晴時多雨</p>
+                <p>20~30</p>
+                <p>舒適</p>
+            </div>
+        </div> -->
+    </div>
+
+    <script>
+        // 天氣API
+        //https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-B5282D9D-8FDD-40E9-AD48-B1DF3270465D
+
+        // 說明
+        // fetch('網址', '送過去的資料')
+        //     .then(function (回來的資料) {
+        //         //資料的處理，通常是將資料萃取
+        //         return 回來的資料.json()
+        //     })
+        //     .then(function (接收上面的return) {
+        //         接收上面的return...做該做的處理
+        //     })
+        var content = document.querySelector('.content')
+
+        fetch('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-B5282D9D-8FDD-40E9-AD48-B1DF3270465D')
+            .then(function (response) {
+                return response.json()
+                //資料的處理，通常是將資料萃取
+            })
+            .then(function (weather) {
+                // 接收上面的return...做該做的處理
+                // console.log(weather.records.location[7].locationName);
+                let location = weather.records.location
+
+                for (let index = 0; index < location.length; index++) {
+
+                    var place = location[index].locationName
+                    var report = location[index].weatherElement[0].time[0].parameter.parameterName
+                    var hightTemp = location[index].weatherElement[4].time[0].parameter.parameterName
+                    var lowTemp = location[index].weatherElement[2].time[0].parameter.parameterName
+                    var feels = location[index].weatherElement[3].time[0].parameter.parameterName
+
+                    //圖片條件
+                    //當降雨機率 <= 30% : 晴天(太陽圖)
+                    //30% < 當下雨機率 <= 60% : 陰天(雲圖)
+                    //當降雨機率 > 60% : 晴天(下雨圖)
+                    if (report <= 30) {
+                        var weatherImg = 'sun.png'
+                    } else if (report <= 60) {
+                        var weatherImg = 'cloud.png'
+                    } else {
+                        var weatherImg = 'rain.png'
+                    }
+                    content.innerHTML +=
+                        `<div class="card">
+                        <div class="img" style="background-image: url('./img/${weatherImg}')"></div>
+                        <div class="info">
+                            <h1>${place}</h1>
+                            <p>${report}</p>
+                            <p>${lowTemp} ~${hightTemp}</p>
+                            <p>${feels}</p>
+                         </div>
+                    </div>`
+                }
+            })
+
+        //先分地點>預報資訊>時間>資訊
+
+        //    var aa =  inputId.value;
+        //    var bb =  inputId2.value;
+        //     var payload = {account:aa,password:bb,ddfsdf:value};
+        //     get post put delete
+    </script>
+</body>
+
+</html>
